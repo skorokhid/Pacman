@@ -90,7 +90,7 @@ class Maze:
                     pygame.draw.rect(screen, BLUE, (x * CELL_SIZE, y * CELL_SIZE + 50, CELL_SIZE, CELL_SIZE))
                 elif self.grid[y][x] == 0:
                     pygame.draw.circle(screen, YELLOW, (x * CELL_SIZE + CELL_SIZE // 2, y * CELL_SIZE + CELL_SIZE // 2 + 50), 3)
-=======
+
         
 
 
@@ -143,3 +143,20 @@ class Ghost:
         x = self.x * CELL_SIZE + CELL_SIZE // 2
         y = self.y * CELL_SIZE + CELL_SIZE // 2 + 50
         pygame.draw.circle(screen, self.color, (x, y), CELL_SIZE // 2)
+
+
+WHITE = (255, 255, 255)
+font = pygame.font.Font(None, 36)
+
+class ScoreManager:
+    def __init__(self):
+        self.score = 0
+
+    def draw(self, screen):
+        score_text = font.render(f"Score: {self.score}", True, WHITE)
+        screen.blit(score_text, (10, 10))
+
+class GameState:
+    PLAYING = 0
+    GAME_OVER = 1
+    GAME_WIN = 2
