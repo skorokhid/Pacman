@@ -151,3 +151,12 @@ class Game:
         self.score_manager = ScoreManager()
         self.game_state = GameState.PLAYING
 
+
+class Game:
+    def __init__(self):
+        self.settings = GameSettings()
+        self.pacman = PacMan()
+        self.ghosts = [Ghost(1, 13, (255, 0, 0))]
+        self.maze = Maze()
+        self.score_manager = ScoreManager()
+        self.game_state = GameState.PLAYING
