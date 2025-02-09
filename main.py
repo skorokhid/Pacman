@@ -142,6 +142,7 @@ class Ghost:
         pygame.draw.circle(screen, self.color, (x, y), CELL_SIZE // 2)
 
 
+
 class Game:
     def __init__(self):
         self.settings = GameSettings()
@@ -152,3 +153,19 @@ class Game:
         self.game_state = GameState.PLAYING
 
 
+
+WHITE = (255, 255, 255)
+font = pygame.font.Font(None, 36)
+
+class ScoreManager:
+    def __init__(self):
+        self.score = 0
+
+    def draw(self, screen):
+        score_text = font.render(f"Score: {self.score}", True, WHITE)
+        screen.blit(score_text, (10, 10))
+
+class GameState:
+    PLAYING = 0
+    GAME_OVER = 1
+    GAME_WIN = 2
