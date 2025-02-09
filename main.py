@@ -64,3 +64,31 @@ class SoundManager:
     @staticmethod
     def play_win_sound():
         win_sound.play()
+
+import pygame
+
+CELL_SIZE = 40
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
+
+class Maze:
+    def __init__(self):
+        self.grid = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,0,1,0,1,0,1,1,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,1,1,1,1,0,1,1,0,1],
+            [1,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
+            [1,1,1,1,0,1,0,1,0,1,0,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        ]
+
+    def draw(self, screen):
+        for y in range(len(self.grid)):
+            for x in range(len(self.grid[y])):
+                if self.grid[y][x] == 1:
+                    pygame.draw.rect(screen, BLUE, (x * CELL_SIZE, y * CELL_SIZE + 50, CELL_SIZE, CELL_SIZE))
+                elif self.grid[y][x] == 0:
+                    pygame.draw.circle(screen, YELLOW, (x * CELL_SIZE + CELL_SIZE // 2, y * CELL_SIZE + CELL_SIZE // 2 + 50), 3)
