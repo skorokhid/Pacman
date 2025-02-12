@@ -47,7 +47,7 @@ class GameSettings:
 
         # Set delays based on difficulty
         global pacman_move_delay, ghost_move_delay, mouth_anim_delay
-        if self.difficulty == 'easy':
+        if self.difficulty == 'easy':      
             pacman_move_delay = 200
             ghost_move_delay = 500
             mouth_anim_delay = 600
