@@ -1,10 +1,11 @@
 import pygame
-import sys
 import random
 import math
 import argparse
 import os
 
+
+# Ініціалізація pygame
 pygame.init()
 
 # Initialize sound variables
@@ -31,6 +32,7 @@ CYAN = (0, 255, 255)
 ORANGE = (255, 165, 0)
 GRAY = (80, 80, 80)
 VIOLET = (151, 89, 154)
+
 HIGHSCORES_FILE = "highscores.txt"
 
 # --- Функції для роботи з рекордами ---
@@ -299,7 +301,10 @@ class Game:
         restart_font = pygame.font.Font(None, 36)
         game_over_text = game_over_font.render("GAME OVER", True, RED)
         score_text = score_font.render(f"Score: {self.score_manager.score}", True, WHITE)
+
         restart_text = restart_font.render("Press SPACE to restart or ESC for menu", True, YELLOW)
+        restart_text = restart_font.render("Press SPACE to restart", True, YELLOW)
+
         screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, SCREEN_HEIGHT // 3))
         screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2))
         screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 2 * SCREEN_HEIGHT // 3))
@@ -312,6 +317,7 @@ class Game:
         win_text = win_font.render("YOU WIN!", True, YELLOW)
         score_text = score_font.render(f"Score: {self.score_manager.score}", True, WHITE)
         restart_text = restart_font.render("Press SPACE to restart or ESC for menu", True, CYAN)
+        restart_text = restart_font.render("Press SPACE to restart", True, CYAN)
         screen.blit(win_text, (SCREEN_WIDTH // 2 - win_text.get_width() // 2, SCREEN_HEIGHT // 3))
         screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2))
         screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 2 * SCREEN_HEIGHT // 3))
@@ -326,7 +332,7 @@ class Game:
         # Show menu before starting the game
         menu = Menu(screen)
         menu.run()
-
+        
         while running:
             current_time = pygame.time.get_ticks()
             for event in pygame.event.get():
@@ -345,8 +351,10 @@ class Game:
                     elif self.game_state in [GameState.GAME_OVER, GameState.GAME_WIN]:
                         if event.key == pygame.K_SPACE:
                             self.reset_game()
+
                         elif event.key == pygame.K_ESCAPE:
                             menu.run()  # Повернутися до меню
+
 
             if self.game_state == GameState.PLAYING:
                 if current_time - self.last_pacman_move_time > pacman_move_delay:
