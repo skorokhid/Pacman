@@ -31,6 +31,7 @@ CYAN = (0, 255, 255)
 ORANGE = (255, 165, 0)
 GRAY = (80, 80, 80)
 VIOLET = (151, 89, 154)
+
 HIGHSCORES_FILE = "highscores.txt"
 
 # --- Функції для роботи з рекордами ---
@@ -359,6 +360,7 @@ class Game:
                     elif self.game_state in [GameState.GAME_OVER, GameState.GAME_WIN]:
                         if event.key == pygame.K_SPACE:
                             self.reset_game()
+
                         elif event.key == pygame.K_ESCAPE:
                             menu.run()  # Повернутися до меню
 
