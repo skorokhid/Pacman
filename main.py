@@ -30,6 +30,7 @@ CYAN = (0, 255, 255)
 ORANGE = (255, 165, 0)
 GRAY = (80, 80, 80)
 VIOLET = (151, 89, 154)
+
 HIGHSCORES_FILE = "highscores.txt"
 
 # --- Функції для роботи з рекордами ---
@@ -119,6 +120,7 @@ class Menu:
         pacman_move_delay, ghost_move_delay, mouth_anim_delay = settings[self.difficulty]
         BG_COLOR = self.bg_colors[self.bg_color]
 
+
 HIGHSCORES_FILE = "highscores.txt"
 
 # --- Функції для роботи з рекордами ---
@@ -130,7 +132,8 @@ def load_highscores():
     return []
 
 def save_highscore(new_score):
-    scores = load_highscores() + [new_score]
+    scores = load_highscores()
+    scores.append(new_score)
     scores = sorted(scores, reverse=True)[:5]
     with open(HIGHSCORES_FILE, "w") as file:
         for score in scores:
@@ -148,6 +151,10 @@ def draw_highscores(screen):
     pygame.display.flip()
     pygame.time.delay(3000)
 
+def clear_highscores():
+    """Очищає файл з рекордами."""
+    if os.path.exists(HIGHSCORES_FILE):
+        os.remove(HIGHSCORES_FILE)
 # --- Клас меню ---
 class Menu:
     def __init__(self, screen):
@@ -395,7 +402,11 @@ class Game:
         restart_font = pygame.font.Font(None, 36)
         game_over_text = game_over_font.render("GAME OVER", True, RED)
         score_text = score_font.render(f"Score: {self.score_manager.score}", True, WHITE)
+
+        restart_text = restart_font.render("Press SPACE to restart or ESC for menu", True, YELLOW)
+
         restart_text = restart_font.render("Press SPACE to restart", True, YELLOW)
+
         screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, SCREEN_HEIGHT // 3))
         screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2))
         screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 2 * SCREEN_HEIGHT // 3))
@@ -407,7 +418,11 @@ class Game:
         restart_font = pygame.font.Font(None, 36)
         win_text = win_font.render("YOU WIN!", True, YELLOW)
         score_text = score_font.render(f"Score: {self.score_manager.score}", True, WHITE)
+
+        restart_text = restart_font.render("Press SPACE to restart or ESC for menu", True, CYAN)
+
         restart_text = restart_font.render("Press SPACE to restart", True, CYAN)
+
         screen.blit(win_text, (SCREEN_WIDTH // 2 - win_text.get_width() // 2, SCREEN_HEIGHT // 3))
         screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2))
         screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 2 * SCREEN_HEIGHT // 3))
@@ -418,6 +433,12 @@ class Game:
         pygame.display.set_caption("Pac-Man")
         clock = pygame.time.Clock()
         running = True
+
+
+        # Show menu before starting the game
+        menu = Menu(screen)
+        menu.run()
+
 
         while running:
             current_time = pygame.time.get_ticks()
@@ -438,12 +459,13 @@ class Game:
                     elif self.game_state in [GameState.GAME_OVER, GameState.GAME_WIN]:
                         if event.key == pygame.K_SPACE:
                             self.reset_game()
-                        elif event.key == pygame.K_ESCAPE:
-                            menu.run()  # Повернутися до меню
 
                         elif event.key == pygame.K_ESCAPE:
                             menu.run()  # Повернутися до меню
 
+
+                        elif event.key == pygame.K_ESCAPE:
+                            menu.run()  # Повернутися до меню
 
             if self.game_state == GameState.PLAYING:
                 if current_time - self.last_pacman_move_time > pacman_move_delay:
