@@ -3,7 +3,6 @@ import sys
 import random
 import math
 import argparse
-import os
 
 pygame.init()
 
@@ -31,6 +30,97 @@ CYAN = (0, 255, 255)
 ORANGE = (255, 165, 0)
 GRAY = (80, 80, 80)
 VIOLET = (151, 89, 154)
+
+HIGHSCORES_FILE = "highscores.txt"
+
+# --- Функції для роботи з рекордами ---
+def load_highscores():
+    if os.path.exists(HIGHSCORES_FILE):
+        with open(HIGHSCORES_FILE, "r") as file:
+            scores = [int(line.strip()) for line in file.readlines()]
+        return sorted(scores, reverse=True)[:5]
+    return []
+
+def save_highscore(new_score):
+    scores = load_highscores()
+    scores.append(new_score)
+    scores = sorted(scores, reverse=True)[:5]
+    with open(HIGHSCORES_FILE, "w") as file:
+        for score in scores:
+            file.write(f"{score}\n")
+
+def draw_highscores(screen):
+    screen.fill(BLACK)
+    font = pygame.font.Font(None, 40)
+    title_text = font.render("High Scores", True, WHITE)
+    screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 50))
+    scores = load_highscores()
+    for i, score in enumerate(scores):
+        score_text = font.render(f"{i+1}. {score}", True, WHITE)
+        screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 100 + i * 40))
+    pygame.display.flip()
+    pygame.time.delay(3000)
+
+def clear_highscores():
+    """Очищає файл з рекордами."""
+    if os.path.exists(HIGHSCORES_FILE):
+        os.remove(HIGHSCORES_FILE)
+# --- Клас меню ---
+class Menu:
+    def __init__(self, screen):
+        self.screen = screen
+        self.options = ["Difficulty: Medium", "Background: Black", "Start Game"]
+        self.difficulties = ["Easy", "Medium", "Hard"]
+        self.bg_colors = {"Black": BLACK, "Pink": PINK, "Gray": GRAY}
+        self.selected = 0
+        self.difficulty = "Medium"
+        self.bg_color = "Black"
+
+    def draw(self):
+        self.screen.fill(BLACK)
+        for i, text in enumerate(self.options):
+            color = YELLOW if i == self.selected else WHITE
+            menu_text = font.render(text, True, color)
+            self.screen.blit(menu_text, (SCREEN_WIDTH // 2 - menu_text.get_width() // 2, 200 + i * 50))
+        pygame.display.flip()
+
+    def update_option(self, direction):
+        if self.selected == 0:
+            idx = self.difficulties.index(self.difficulty) + direction
+            self.difficulty = self.difficulties[idx % len(self.difficulties)]
+            self.options[0] = f"Difficulty: {self.difficulty}"
+        elif self.selected == 1:
+            bg_list = list(self.bg_colors.keys())
+            idx = bg_list.index(self.bg_color) + direction
+            self.bg_color = bg_list[idx % len(bg_list)]
+            self.options[1] = f"Background: {self.bg_color}"
+
+    def run(self):
+        global pacman_move_delay, ghost_move_delay, mouth_anim_delay, BG_COLOR
+        running = True
+        while running:
+            self.draw()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        self.selected = (self.selected - 1) % len(self.options)
+                    elif event.key == pygame.K_DOWN:
+                        self.selected = (self.selected + 1) % len(self.options)
+                    elif event.key in (pygame.K_LEFT, pygame.K_RIGHT):
+                        direction = -1 if event.key == pygame.K_LEFT else 1
+                        self.update_option(direction)
+                    elif event.key == pygame.K_RETURN and self.selected == 2:
+                        running = False
+
+        # --- Налаштування складності ---
+        settings = {"Easy": (200, 500, 600), "Medium": (150, 400, 500), "Hard": (100, 300, 400)}
+        pacman_move_delay, ghost_move_delay, mouth_anim_delay = settings[self.difficulty]
+        BG_COLOR = self.bg_colors[self.bg_color]
+
+
 HIGHSCORES_FILE = "highscores.txt"
 
 # --- Функції для роботи з рекордами ---
@@ -312,7 +402,11 @@ class Game:
         restart_font = pygame.font.Font(None, 36)
         game_over_text = game_over_font.render("GAME OVER", True, RED)
         score_text = score_font.render(f"Score: {self.score_manager.score}", True, WHITE)
+
         restart_text = restart_font.render("Press SPACE to restart or ESC for menu", True, YELLOW)
+
+        restart_text = restart_font.render("Press SPACE to restart", True, YELLOW)
+
         screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, SCREEN_HEIGHT // 3))
         screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2))
         screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 2 * SCREEN_HEIGHT // 3))
@@ -324,7 +418,11 @@ class Game:
         restart_font = pygame.font.Font(None, 36)
         win_text = win_font.render("YOU WIN!", True, YELLOW)
         score_text = score_font.render(f"Score: {self.score_manager.score}", True, WHITE)
+
         restart_text = restart_font.render("Press SPACE to restart or ESC for menu", True, CYAN)
+
+        restart_text = restart_font.render("Press SPACE to restart", True, CYAN)
+
         screen.blit(win_text, (SCREEN_WIDTH // 2 - win_text.get_width() // 2, SCREEN_HEIGHT // 3))
         screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2))
         screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 2 * SCREEN_HEIGHT // 3))
@@ -336,9 +434,11 @@ class Game:
         clock = pygame.time.Clock()
         running = True
 
+
         # Show menu before starting the game
         menu = Menu(screen)
         menu.run()
+
 
         while running:
             current_time = pygame.time.get_ticks()
@@ -359,6 +459,11 @@ class Game:
                     elif self.game_state in [GameState.GAME_OVER, GameState.GAME_WIN]:
                         if event.key == pygame.K_SPACE:
                             self.reset_game()
+
+                        elif event.key == pygame.K_ESCAPE:
+                            menu.run()  # Повернутися до меню
+
+
                         elif event.key == pygame.K_ESCAPE:
                             menu.run()  # Повернутися до меню
 
