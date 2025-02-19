@@ -1,11 +1,10 @@
 import pygame
+import sys
 import random
 import math
 import argparse
 import os
 
-
-# Ініціалізація pygame
 pygame.init()
 
 # Initialize sound variables
@@ -32,7 +31,6 @@ CYAN = (0, 255, 255)
 ORANGE = (255, 165, 0)
 GRAY = (80, 80, 80)
 VIOLET = (151, 89, 154)
-
 HIGHSCORES_FILE = "highscores.txt"
 
 # --- Функції для роботи з рекордами ---
@@ -44,7 +42,8 @@ def load_highscores():
     return []
 
 def save_highscore(new_score):
-    scores = load_highscores() + [new_score]
+    scores = load_highscores()
+    scores.append(new_score)
     scores = sorted(scores, reverse=True)[:5]
     with open(HIGHSCORES_FILE, "w") as file:
         for score in scores:
@@ -62,6 +61,10 @@ def draw_highscores(screen):
     pygame.display.flip()
     pygame.time.delay(3000)
 
+def clear_highscores():
+    """Очищає файл з рекордами."""
+    if os.path.exists(HIGHSCORES_FILE):
+        os.remove(HIGHSCORES_FILE)
 # --- Клас меню ---
 class Menu:
     def __init__(self, screen):
@@ -171,9 +174,13 @@ class PacMan:
                 grid[new_y][new_x] = 2  # Mark as eaten
                 score += 10
                 SoundManager.play_eat_sound()
-                if all(cell != 0 for row in grid for cell in row):
-                    game_state = GameState.GAME_WIN
-                    SoundManager.play_win_sound()
+            elif grid[new_y][new_x] == 4:  # Заряджений бонус
+                grid[new_y][new_x] = 2  # Mark as eaten
+                score += 50
+                SoundManager.play_eat_sound()
+            if all(cell != 0 and cell != 4 for row in grid for cell in row):  # Перевірка на перемогу
+                game_state = GameState.GAME_WIN
+                SoundManager.play_win_sound()
         return score, game_state
 
     def draw(self, screen):
@@ -212,9 +219,11 @@ class Ghost:
         random.shuffle(directions)
         for dx, dy in directions:
             new_x, new_y = self.x + dx, self.y + dy
-            if 0 <= new_x < GRID_WIDTH and 0 <= new_y < GRID_HEIGHT and grid[new_y][new_x] != 1:
-                self.x, self.y = new_x, new_y
-                break
+            # Перевірка на межі лабіринту
+            if 0 <= new_x < GRID_WIDTH and 0 <= new_y < GRID_HEIGHT:
+                if grid[new_y][new_x] != 1:  # Перевірка на стіну
+                    self.x, self.y = new_x, new_y
+                    break
 
     def draw(self, screen):
         x = self.x * CELL_SIZE + CELL_SIZE // 2
@@ -224,21 +233,21 @@ class Ghost:
 class Maze:
     def __init__(self):
         self.grid = [
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
-            [1,0,1,1,0,1,0,1,0,1,0,1,1,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,1,1,0,1,1,1,1,1,0,1,1,0,1],
-            [1,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
-            [1,1,1,1,0,1,0,1,0,1,0,1,1,1,1],
-            [1,1,1,1,0,1,0,0,0,1,0,1,1,1,1],
-            [1,1,1,1,0,1,0,1,0,1,0,1,1,1,1],
-            [1,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
-            [1,0,1,1,0,1,1,1,1,1,0,1,1,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,1,1,0,1,0,1,0,1,0,1,1,0,1],
-            [1,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 4, 0, 0, 1, 0, 0, 4, 0, 0, 0, 1],
+            [1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+            [1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1],
+            [1, 0, 1, 1, 4, 1, 1, 1, 1, 1, 4, 1, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         ]
 
     def draw(self, screen):
@@ -248,6 +257,8 @@ class Maze:
                     pygame.draw.rect(screen, BLUE, (x*CELL_SIZE, y*CELL_SIZE+50, CELL_SIZE, CELL_SIZE))
                 elif self.grid[y][x] == 0:
                     pygame.draw.circle(screen, YELLOW, (x*CELL_SIZE+CELL_SIZE//2, y*CELL_SIZE+CELL_SIZE//2+50), 3)
+                elif self.grid[y][x] == 4:  # Заряджений бонус
+                    pygame.draw.circle(screen, ORANGE, (x*CELL_SIZE+CELL_SIZE//2, y*CELL_SIZE+CELL_SIZE//2+50), 6)
 
 class SoundManager:
     @staticmethod
@@ -301,10 +312,7 @@ class Game:
         restart_font = pygame.font.Font(None, 36)
         game_over_text = game_over_font.render("GAME OVER", True, RED)
         score_text = score_font.render(f"Score: {self.score_manager.score}", True, WHITE)
-
         restart_text = restart_font.render("Press SPACE to restart or ESC for menu", True, YELLOW)
-        restart_text = restart_font.render("Press SPACE to restart", True, YELLOW)
-
         screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, SCREEN_HEIGHT // 3))
         screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2))
         screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 2 * SCREEN_HEIGHT // 3))
@@ -317,7 +325,6 @@ class Game:
         win_text = win_font.render("YOU WIN!", True, YELLOW)
         score_text = score_font.render(f"Score: {self.score_manager.score}", True, WHITE)
         restart_text = restart_font.render("Press SPACE to restart or ESC for menu", True, CYAN)
-        restart_text = restart_font.render("Press SPACE to restart", True, CYAN)
         screen.blit(win_text, (SCREEN_WIDTH // 2 - win_text.get_width() // 2, SCREEN_HEIGHT // 3))
         screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2))
         screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 2 * SCREEN_HEIGHT // 3))
@@ -332,11 +339,12 @@ class Game:
         # Show menu before starting the game
         menu = Menu(screen)
         menu.run()
-        
+
         while running:
             current_time = pygame.time.get_ticks()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    clear_highscores()  # Видалити файл з рекордами
                     running = False
                 elif event.type == pygame.KEYDOWN:
                     if self.game_state == GameState.PLAYING:
@@ -351,10 +359,8 @@ class Game:
                     elif self.game_state in [GameState.GAME_OVER, GameState.GAME_WIN]:
                         if event.key == pygame.K_SPACE:
                             self.reset_game()
-
                         elif event.key == pygame.K_ESCAPE:
                             menu.run()  # Повернутися до меню
-
 
             if self.game_state == GameState.PLAYING:
                 if current_time - self.last_pacman_move_time > pacman_move_delay:
@@ -381,9 +387,18 @@ class Game:
                         SoundManager.play_lose_sound()
 
             elif self.game_state == GameState.GAME_OVER:
+                save_highscore(self.score_manager.score)  # Зберегти рекорд
                 self.draw_game_over(screen)
+                pygame.display.flip()
+                pygame.time.delay(2000)  # Затримка перед показом рекордів
+                draw_highscores(screen)  # Показати рекорди
+
             elif self.game_state == GameState.GAME_WIN:
+                save_highscore(self.score_manager.score)  # Зберегти рекорд
                 self.draw_game_win(screen)
+                pygame.display.flip()
+                pygame.time.delay(2000)  # Затримка перед показом рекордів
+                draw_highscores(screen)  # Показати рекорди
 
             pygame.display.flip()
             clock.tick(60)
