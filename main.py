@@ -1,132 +1,298 @@
 import pygame
 import random
-import sys
+import math
+import argparse
 
 # Ініціалізація pygame
 pygame.init()
 
-# Константи екрану
-WIDTH, HEIGHT = 500, 500
-CELL_SIZE = 25
-ROWS, COLS = HEIGHT // CELL_SIZE, WIDTH // CELL_SIZE
-FPS = 10
+# Initialize sound variables
+eat_sound = pygame.mixer.Sound("./sounds/collect.wav")
+lose_sound = pygame.mixer.Sound("./sounds/lose.wav")
+win_sound = pygame.mixer.Sound("./sounds/win.wav")
 
-# Кольори
+# Initialize font
+font = pygame.font.Font(None, 36)
+
+# Constants
+CELL_SIZE = 40
+GRID_WIDTH = 15
+GRID_HEIGHT = 15
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 650
 BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-YELLOW = (255, 255, 0)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+PINK = (255, 192, 203)
+CYAN = (0, 255, 255)
+ORANGE = (255, 165, 0)
+GRAY = (80, 80, 80)
+VIOLET = (151, 89, 154)
 
-# Фони
-BACKGROUND_COLORS = {
-    "Black": BLACK,
-    "White": WHITE,
-    "Green": GREEN,
-    "Blue": BLUE
-}
+class GameSettings:
+    def __init__(self):
+        self.difficulty = 'medium'
+        self.bg_color = 'black'
+        self.parse_args()
 
-# Меню вибору складності та кольору фону
-def menu():
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Pac-Man Menu")
-    font = pygame.font.Font(None, 36)
-    
-    difficulties = ["Easy", "Medium", "Hard"]
-    background_names = list(BACKGROUND_COLORS.keys())
-    
-    selected_difficulty = 1  # За замовчуванням Medium
-    selected_background = 0   # За замовчуванням Black
-    
-    while True:
-        screen.fill(WHITE)
-        title = font.render("Select Difficulty and Background", True, BLACK)
-        screen.blit(title, (50, 50))
-        
-        for i, diff in enumerate(difficulties):
-            color = RED if i == selected_difficulty else BLACK
-            text = font.render(diff, True, color)
-            screen.blit(text, (50, 100 + i * 40))
-        
-        for i, bg in enumerate(background_names):
-            color = RED if i == selected_background else BLACK
-            text = font.render(bg, True, color)
-            screen.blit(text, (250, 100 + i * 40))
-        
-        pygame.display.flip()
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    selected_difficulty = (selected_difficulty - 1) % len(difficulties)
-                if event.key == pygame.K_DOWN:
-                    selected_difficulty = (selected_difficulty + 1) % len(difficulties)
-                if event.key == pygame.K_LEFT:
-                    selected_background = (selected_background - 1) % len(background_names)
-                if event.key == pygame.K_RIGHT:
-                    selected_background = (selected_background + 1) % len(background_names)
-                if event.key == pygame.K_RETURN:
-                    return difficulties[selected_difficulty], BACKGROUND_COLORS[background_names[selected_background]]
+    def parse_args(self):
+        parser = argparse.ArgumentParser(description="Pac-Man Game Settings")
+        parser.add_argument('--difficulty', type=str, choices=['easy', 'medium', 'hard'], default='hard', help="Set the game difficulty")
+        parser.add_argument('--bg_color', type=str, choices=['black', 'pink', 'gray'], default='pink', help="Set the background color")
+        args = parser.parse_args()
+        self.difficulty = args.difficulty
+        self.bg_color = args.bg_color
 
-# Основна функція гри
-def game(difficulty, background_color):
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Pac-Man")
-    clock = pygame.time.Clock()
-    
-    pacman = pygame.Rect(WIDTH // 2, HEIGHT // 2, CELL_SIZE, CELL_SIZE)
-    pacman_speed = 5 if difficulty == "Easy" else 10 if difficulty == "Medium" else 15
-    dx, dy = 0, 0
-    
-    ghosts = [pygame.Rect(random.randint(0, COLS - 1) * CELL_SIZE, random.randint(0, ROWS - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE) for _ in range(3)]
-    ghost_speed = 2 if difficulty == "Easy" else 4 if difficulty == "Medium" else 6
-    
-    running = True
-    while running:
-        screen.fill(background_color)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    dx, dy = -pacman_speed, 0
-                if event.key == pygame.K_RIGHT:
-                    dx, dy = pacman_speed, 0
-                if event.key == pygame.K_UP:
-                    dx, dy = 0, -pacman_speed
-                if event.key == pygame.K_DOWN:
-                    dx, dy = 0, pacman_speed
-        
-        pacman.x += dx
-        pacman.y += dy
-        
-        # Обмеження руху Pac-Man
-        pacman.x = max(0, min(WIDTH - CELL_SIZE, pacman.x))
-        pacman.y = max(0, min(HEIGHT - CELL_SIZE, pacman.y))
-        
-        pygame.draw.rect(screen, YELLOW, pacman)
-        
-        # Рух привидів
-        for ghost in ghosts:
-            ghost.x += random.choice([-ghost_speed, ghost_speed])
-            ghost.y += random.choice([-ghost_speed, ghost_speed])
-            ghost.x = max(0, min(WIDTH - CELL_SIZE, ghost.x))
-            ghost.y = max(0, min(HEIGHT - CELL_SIZE, ghost.y))
-            pygame.draw.rect(screen, RED, ghost)
-            
-            if pacman.colliderect(ghost):
-                running = False  # Програш
-        
-        pygame.display.flip()
-        clock.tick(FPS)
-    
-    pygame.quit()
-    sys.exit()
+        # Set delays based on difficulty
+        global pacman_move_delay, ghost_move_delay, mouth_anim_delay
+        if self.difficulty == 'easy':      
+            pacman_move_delay = 200
+            ghost_move_delay = 500
+            mouth_anim_delay = 600
+        elif self.difficulty == 'medium':
+            pacman_move_delay = 150
+            ghost_move_delay = 400
+            mouth_anim_delay = 500
+        else:  # 'hard' 
+            pacman_move_delay = 100
+            ghost_move_delay = 300
+            mouth_anim_delay = 400
 
-if __name__ == "__main__":
-    difficulty, background_color = menu()
-    game(difficulty, background_color)
+        # Set background color
+        global BG_COLOR
+        if self.bg_color == 'pink':
+            BG_COLOR = PINK
+        elif self.bg_color == 'gray':
+            BG_COLOR = GRAY
+        else:  # 'default(black)'
+            BG_COLOR = BLACK
+
+class PacMan:
+    def __init__(self):
+        self.x = 1
+        self.y = 1
+        self.direction = 3  # 0: right, 1: down, 2: left, 3: up
+        self.mouth_open = False
+
+    def move(self, grid, score, game_state):
+        dx, dy = [(1, 0), (0, 1), (-1, 0), (0, -1)][self.direction]
+        new_x, new_y = self.x + dx, self.y + dy
+        if grid[new_y][new_x] != 1:
+            self.x, self.y = new_x, new_y
+            if grid[new_y][new_x] == 0:
+                grid[new_y][new_x] = 2  # Mark as eaten
+                score += 10
+                SoundManager.play_eat_sound()
+                if all(cell != 0 for row in grid for cell in row):
+                    game_state = GameState.GAME_WIN
+                    SoundManager.play_win_sound()
+        return score, game_state
+
+    def draw(self, screen):
+        x = self.x * CELL_SIZE + CELL_SIZE // 2
+        y = self.y * CELL_SIZE + CELL_SIZE // 2 + 50
+        mouth_opening = 45 if self.mouth_open else 0
+        pygame.draw.circle(screen, YELLOW, (x, y), CELL_SIZE // 2)
+        if self.direction == 0:  # Right
+            start_angle = 360 - mouth_opening / 2
+            end_angle = mouth_opening / 2
+        elif self.direction == 3:  # Down
+            start_angle = 90 - mouth_opening / 2
+            end_angle = 90 + mouth_opening / 2
+        elif self.direction == 2:  # Left
+            start_angle = 180 - mouth_opening / 2
+            end_angle = 180 + mouth_opening / 2
+        else:  # Ups
+            start_angle = 270 - mouth_opening / 2
+            end_angle = 270 + mouth_opening / 2
+        pygame.draw.arc(screen, BLACK, (x - CELL_SIZE // 2, y - CELL_SIZE // 2, CELL_SIZE, CELL_SIZE), math.radians(start_angle), math.radians(end_angle), CELL_SIZE // 2)
+        mouth_line_end_x = x + math.cos(math.radians(start_angle)) * CELL_SIZE // 2
+        mouth_line_end_y = y - math.sin(math.radians(start_angle)) * CELL_SIZE // 2
+        pygame.draw.line(screen, BLACK, (x, y), (mouth_line_end_x, mouth_line_end_y), 2)
+        mouth_line_end_x = x + math.cos(math.radians(end_angle)) * CELL_SIZE // 2
+        mouth_line_end_y = y - math.sin(math.radians(end_angle)) * CELL_SIZE // 2
+        pygame.draw.line(screen, BLACK, (x, y), (mouth_line_end_x, mouth_line_end_y), 2)
+
+class Ghost:
+    def __init__(self, x, y, color):
+        self.x = x
+        self.y = y
+        self.color = color
+
+    def move(self, grid):
+        directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+        random.shuffle(directions)
+        for dx, dy in directions:
+            new_x, new_y = self.x + dx, self.y + dy
+            if 0 <= new_x < GRID_WIDTH and 0 <= new_y < GRID_HEIGHT and grid[new_y][new_x] != 1:
+                self.x, self.y = new_x, new_y
+                break
+
+    def draw(self, screen):
+        x = self.x * CELL_SIZE + CELL_SIZE // 2
+        y = self.y * CELL_SIZE + CELL_SIZE // 2 + 50
+        pygame.draw.circle(screen, self.color, (x, y), CELL_SIZE // 2)
+
+class Maze:
+    def __init__(self):
+        self.grid = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,0,1,0,1,0,1,1,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,1,1,1,1,0,1,1,0,1],
+            [1,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
+            [1,1,1,1,0,1,0,1,0,1,0,1,1,1,1],
+            [1,1,1,1,0,1,0,0,0,1,0,1,1,1,1],
+            [1,1,1,1,0,1,0,1,0,1,0,1,1,1,1],
+            [1,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,1,1,1,1,0,1,1,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,0,1,0,1,0,1,1,0,1],
+            [1,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        ]
+
+    def draw(self, screen):
+        for y in range(GRID_HEIGHT):
+            for x in range(GRID_WIDTH):
+                if self.grid[y][x] == 1:
+                    pygame.draw.rect(screen, BLUE, (x*CELL_SIZE, y*CELL_SIZE+50, CELL_SIZE, CELL_SIZE))
+                elif self.grid[y][x] == 0:
+                    pygame.draw.circle(screen, YELLOW, (x*CELL_SIZE+CELL_SIZE//2, y*CELL_SIZE+CELL_SIZE//2+50), 3)
+
+class SoundManager:
+    @staticmethod
+    def play_eat_sound():
+        eat_sound.play()
+
+    @staticmethod
+    def play_lose_sound():
+        lose_sound.play()
+
+    @staticmethod
+    def play_win_sound():
+        win_sound.play()
+
+class ScoreManager:
+    def __init__(self):
+        self.score = 0
+
+    def draw(self, screen):
+        score_text = font.render(f"score:{self.score}", True, WHITE)
+        screen.blit(score_text, (10, 10))
+
+class GameState:
+    PLAYING = 0
+    GAME_OVER = 1
+    GAME_WIN = 2
+
+class Game:
+    def __init__(self):
+        self.settings = GameSettings()
+        self.pacman = PacMan()
+        self.ghosts = [Ghost(1, 13, RED), Ghost(13, 1, VIOLET), Ghost(13, 13, CYAN), Ghost(11, 11, ORANGE)]
+        self.maze = Maze()
+        self.score_manager = ScoreManager()
+        self.game_state = GameState.PLAYING
+        self.last_pacman_move_time = 0
+        self.last_ghost_move_time = 0
+        self.last_mouth_anim_time = 0
+
+    def reset_game(self):
+        self.pacman = PacMan()
+        self.ghosts = [Ghost(1, 13, RED), Ghost(13, 1, VIOLET), Ghost(13, 13, CYAN), Ghost(11, 11, ORANGE)]
+        self.maze = Maze()
+        self.score_manager = ScoreManager()
+        self.game_state = GameState.PLAYING
+
+    def draw_game_over(self, screen):
+        screen.fill(BLACK)
+        game_over_font = pygame.font.Font(None, 64)
+        score_font = pygame.font.Font(None, 48)
+        restart_font = pygame.font.Font(None, 36)
+        game_over_text = game_over_font.render("GAME OVER", True, RED)
+        score_text = score_font.render(f"Score: {self.score_manager.score}", True, WHITE)
+        restart_text = restart_font.render("Press SPACE to restart", True, YELLOW)
+        screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, SCREEN_HEIGHT // 3))
+        screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2))
+        screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 2 * SCREEN_HEIGHT // 3))
+
+    def draw_game_win(self, screen):
+        screen.fill(BLACK)
+        win_font = pygame.font.Font(None, 64)
+        score_font = pygame.font.Font(None, 48)
+        restart_font = pygame.font.Font(None, 36)
+        win_text = win_font.render("YOU WIN!", True, YELLOW)
+        score_text = score_font.render(f"Score: {self.score_manager.score}", True, WHITE)
+        restart_text = restart_font.render("Press SPACE to restart", True, CYAN)
+        screen.blit(win_text, (SCREEN_WIDTH // 2 - win_text.get_width() // 2, SCREEN_HEIGHT // 3))
+        screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2))
+        screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 2 * SCREEN_HEIGHT // 3))
+
+    def run(self):
+        pygame.init()
+        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption("Pac-Man")
+        clock = pygame.time.Clock()
+        running = True
+
+        while running:
+            current_time = pygame.time.get_ticks()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    if self.game_state == GameState.PLAYING:
+                        if event.key == pygame.K_UP:
+                            self.pacman.direction = 3
+                        elif event.key == pygame.K_DOWN:
+                            self.pacman.direction = 1
+                        elif event.key == pygame.K_LEFT:
+                            self.pacman.direction = 2
+                        elif event.key == pygame.K_RIGHT:
+                            self.pacman.direction = 0
+                    elif self.game_state in [GameState.GAME_OVER, GameState.GAME_WIN]:
+                        if event.key == pygame.K_SPACE:
+                            self.reset_game()
+
+            if self.game_state == GameState.PLAYING:
+                if current_time - self.last_pacman_move_time > pacman_move_delay:
+                    self.score_manager.score, self.game_state = self.pacman.move(self.maze.grid, self.score_manager.score, self.game_state)
+                    self.last_pacman_move_time = current_time
+                if current_time - self.last_ghost_move_time > ghost_move_delay:
+                    for ghost in self.ghosts:
+                        ghost.move(self.maze.grid)
+                    self.last_ghost_move_time = current_time
+                if current_time - self.last_mouth_anim_time > mouth_anim_delay:
+                    self.pacman.mouth_open = not self.pacman.mouth_open
+                    self.last_mouth_anim_time = current_time
+
+                screen.fill(BG_COLOR)
+                self.maze.draw(screen)
+                self.pacman.draw(screen)
+                for ghost in self.ghosts:
+                    ghost.draw(screen)
+                self.score_manager.draw(screen)
+
+                for ghost in self.ghosts:
+                    if self.pacman.x == ghost.x and self.pacman.y == ghost.y:
+                        self.game_state = GameState.GAME_OVER
+                        SoundManager.play_lose_sound()
+
+            elif self.game_state == GameState.GAME_OVER:
+                self.draw_game_over(screen)
+            elif self.game_state == GameState.GAME_WIN:
+                self.draw_game_win(screen)
+
+            pygame.display.flip()
+            clock.tick(60)
+
+        pygame.quit()
+        sys.exit()
+
+# Initialize game
+game = Game()
+game.run()
