@@ -31,8 +31,20 @@ class Menu:
             self.bg_color = bg_list[idx % len(bg_list)]
             self.options[1] = f"Background: {self.bg_color}"
 
+    def get_settings(self):
+        """Повертає налаштування, які обрав користувач."""
+        settings = {
+            "difficulty": self.difficulty,
+            "bg_color": self.bg_colors[self.bg_color],
+            "delays": {
+                "Easy": (200, 500, 600),
+                "Medium": (150, 400, 500),
+                "Hard": (100, 300, 400)
+            }[self.difficulty]
+        }
+        return settings
+
     def run(self):
-        global pacman_move_delay, ghost_move_delay, mouth_anim_delay, BG_COLOR
         running = True
         while running:
             self.draw()
@@ -50,8 +62,4 @@ class Menu:
                         self.update_option(direction)
                     elif event.key == pygame.K_RETURN and self.selected == 2:
                         running = False
-
-        # --- Налаштування ---
-        settings = {"Easy": (200, 500, 600), "Medium": (150, 400, 500), "Hard": (100, 300, 400)}
-        pacman_move_delay, ghost_move_delay, mouth_anim_delay = settings[self.difficulty]
-        BG_COLOR = self.bg_colors[self.bg_color]
+        return self.get_settings()

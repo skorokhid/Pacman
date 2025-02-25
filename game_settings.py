@@ -31,11 +31,11 @@ class GameSettings:
             ghost_move_delay = 300
             mouth_anim_delay = 400
 
-        # Set background color
-        global BG_COLOR
+    def get_bg_color(self):
+        """Повертає колір фону на основі налаштувань."""
         if self.bg_color == 'pink':
-            BG_COLOR = PINK
+            return PINK
         elif self.bg_color == 'gray':
-            BG_COLOR = GRAY
+            return GRAY
         else:  # 'default(black)'
-            BG_COLOR = BLACK
+            return BLACK

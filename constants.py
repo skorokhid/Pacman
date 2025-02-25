@@ -2,6 +2,9 @@
 import pygame
 import os
 
+pygame.init()
+pygame.mixer.init()
+
 # Initialize sound variables
 eat_sound = pygame.mixer.Sound("./sounds/collect.wav")
 lose_sound = pygame.mixer.Sound("./sounds/lose.wav")
