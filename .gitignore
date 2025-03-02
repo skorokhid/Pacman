@@ -7,4 +7,3 @@
 .vscode/
 report.html
 !requirements.txt
-test_sound_manager.py
