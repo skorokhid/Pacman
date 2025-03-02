@@ -2,13 +2,13 @@ name: Pacman CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [main, test-ci]
   pull_request:
-    branches: [main]
+    branches: [main, test-ci]
 
 jobs:
   test:
-    runs-on: ubuntu-latest  
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -28,7 +28,7 @@ jobs:
           path: report.html
 
   lint:
-    runs-on: ubuntu-latest  
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
