@@ -16,6 +16,8 @@ if os.getenv('CI') is None:
                 pass
         pygame.mixer.Sound = MockSound
 
+pygame.mixer.init()
+
 
 # Initialize sound variables
 eat_sound = pygame.mixer.Sound("./sounds/collect.wav")
