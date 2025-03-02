@@ -1,4 +1,3 @@
----
 name: CI/CD Pipeline
 
 on:
@@ -9,11 +8,11 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Виправлено на ubuntu-latest
     steps:
-      - uses: actions/checkout@latest
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@latest
+        uses: actions/setup-python@v3
         with:
           python-version: "3.11"
       - name: Install dependencies
@@ -23,17 +22,17 @@ jobs:
         run: |
           pytest tests/ --html=report.html
       - name: Upload test report
-        uses: actions/upload-artifact@latest
+        uses: actions/upload-artifact@v3
         with:
           name: test-report
           path: report.html
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Виправлено на ubuntu-latest
     steps:
-      - uses: actions/checkout@latest
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@latest
+        uses: actions/setup-python@v3
         with:
           python-version: "3.11"
       - name: Install dependencies
@@ -44,7 +43,7 @@ jobs:
         run: |
           flake8 --format=html --htmldir=flake8_report
       - name: Upload lint report
-        uses: actions/upload-artifact@latest
+        uses: actions/upload-artifact@v3
         with:
           name: lint-report
           path: flake8_report/index.html
