@@ -4,10 +4,14 @@ import os
 
 pygame.init()
 
-if os.getenv('CI') is None:  # Перевірка на середовище CI (Continuous Integration)
-    pygame.mixer.init()
 
+if os.getenv('CI') is None: 
+    try:
+        pygame.mixer.init()
+    except pygame.error:
+        print("Не вдалося ініціалізувати міксер звуків.")
 
+        
 # Initialize sound variables
 eat_sound = pygame.mixer.Sound("./sounds/collect.wav")
 lose_sound = pygame.mixer.Sound("./sounds/lose.wav")
