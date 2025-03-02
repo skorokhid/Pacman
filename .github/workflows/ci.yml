@@ -10,9 +10,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@latest
+      - uses: actions/checkout@4.2.2
       - name: Set up Python
-        uses: actions/setup-python@latest
+        uses: actions/setup-python@5.4.0
         with:
           python-version: "3.11"
       - name: Install dependencies
@@ -22,7 +22,7 @@ jobs:
         run: |
           pytest tests/ --html=report.html
       - name: Upload test report
-        uses: actions/upload-artifact@latest
+        uses: actions/upload-artifact@4.6.1
         with:
           name: test-report
           path: report.html
@@ -30,9 +30,9 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@latest
+      - uses: actions/checkout@4.2.2
       - name: Set up Python
-        uses: actions/setup-python@latest
+        uses: actions/setup-python@5.4.0
         with:
           python-version: "3.11"
       - name: Install dependencies
@@ -43,7 +43,7 @@ jobs:
         run: |
           flake8 --format=html --htmldir=flake8_report
       - name: Upload lint report
-        uses: actions/upload-artifact@latest
+        uses: actions/upload-artifact@4.6.1
         with:
           name: lint-report
           path: flake8_report/index.html
