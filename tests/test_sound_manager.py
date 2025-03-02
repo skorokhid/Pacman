@@ -2,11 +2,10 @@
 from unittest.mock import patch
 from sound_manager import SoundManager
 
-
-@patch("pygame.mixer.Sound")  # Патчимо pygame.mixer.Sound, щоб не завантажувати звук
+# Патчимо pygame.mixer.init(), щоб воно не викликалося під час тестів
+@patch("pygame.mixer.init")
 @patch.object(SoundManager, "play_eat_sound")
-def test_play_eat_sound(mock_play, mock_sound):
-    # Під час тесту виклик play_eat_sound не буде викликати реальний pygame.mixer.Sound
-    mock_sound.return_value = mock_play  # Ми говоримо, що повертається mock_play, коли викликається Sound
+def test_play_eat_sound(mock_play, mock_init):
     SoundManager.play_eat_sound()
     mock_play.assert_called_once()
+    mock_init.assert_not_called()  # Перевіряємо, що init не був викликаний
