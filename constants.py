@@ -4,8 +4,9 @@ import os
 
 pygame.init()
 if os.getenv("DISABLE_SOUND") != "1":
-    pygame.mixer.init()
-
+    pygame.mixer.init()  # Ініціалізуємо звук тільки якщо DISABLE_SOUND не встановлено в 1
+else:
+    print("Звук вимкнено для тестування.")
 
 # Initialize sound variables
 eat_sound = pygame.mixer.Sound("./sounds/collect.wav")

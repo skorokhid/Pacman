@@ -30,7 +30,6 @@ jobs:
         with:
           name: test-report
           path: report.html
-     
 
   lint:
     runs-on: ubuntu-latest
