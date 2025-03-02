@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Pacman CI/CD Pipeline
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest  # Виправлено на ubuntu-latest
+    runs-on: ubuntu-latest  
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -28,7 +28,7 @@ jobs:
           path: report.html
 
   lint:
-    runs-on: ubuntu-latest  # Виправлено на ubuntu-latest
+    runs-on: ubuntu-latest  
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
