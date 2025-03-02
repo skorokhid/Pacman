@@ -16,13 +16,13 @@ jobs:
         with:
           python-version: "3.11"
       - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV 
+        run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
       - name: Run tests
         run: |
-                    pytest --import-mode=append tests/ --html=report.html
+          pytest tests/ --html=report.html
       - name: Upload test report
         uses: actions/upload-artifact@v4.6.1
         with:
