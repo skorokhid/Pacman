@@ -5,13 +5,15 @@ import os
 pygame.init()
 
 
-if os.getenv('CI') is None: 
+
+if os.getenv('CI') is None:
     try:
         pygame.mixer.init()
-    except pygame.error:
-        print("Не вдалося ініціалізувати міксер звуків.")
+    except pygame.error as e:
+        print(f"Не вдалося ініціалізувати міксер звуків: {e}")
+        pygame.mixer = None  # У разі помилки в ініціалізації
 
-        
+
 # Initialize sound variables
 eat_sound = pygame.mixer.Sound("./sounds/collect.wav")
 lose_sound = pygame.mixer.Sound("./sounds/lose.wav")
