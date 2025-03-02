@@ -3,3 +3,6 @@
 *puml
 *drawio
 /__pycache__
+.venv/
+.vscode/
+report.html

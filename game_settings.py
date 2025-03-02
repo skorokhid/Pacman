@@ -3,10 +3,11 @@ import argparse
 from constants import *
 
 class GameSettings:
-    def __init__(self):
+    def __init__(self,test_mode=False):
         self.difficulty = 'medium'
         self.bg_color = 'black'
-        self.parse_args()
+        if not test_mode:
+            self.parse_args()
 
     def parse_args(self):
         parser = argparse.ArgumentParser(description="Pac-Man Game Settings")
@@ -30,6 +31,7 @@ class GameSettings:
             pacman_move_delay = 100
             ghost_move_delay = 300
             mouth_anim_delay = 400
+
 
     def get_bg_color(self):
         """Повертає колір фону на основі налаштувань."""
