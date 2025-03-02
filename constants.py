@@ -3,7 +3,8 @@ import pygame
 import os
 
 pygame.init()
-pygame.mixer.init()
+if os.getenv("DISABLE_SOUND") != "1":
+    pygame.mixer.init()
 
 
 # Initialize sound variables
