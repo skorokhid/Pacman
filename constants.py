@@ -3,9 +3,10 @@ import pygame
 import os
 
 pygame.init()
+
 if os.getenv('CI') is None:  # Перевірка на середовище CI (Continuous Integration)
     pygame.mixer.init()
-pygame.mixer.init()
+
 
 # Initialize sound variables
 eat_sound = pygame.mixer.Sound("./sounds/collect.wav")
