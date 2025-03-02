@@ -6,15 +6,10 @@ pygame.init()
 
 
 
-if os.getenv('CI') is None:
-    try:
-        pygame.mixer.init()
-    except pygame.error:
-        print("Не вдалося ініціалізувати міксер звуків.")
-        class MockSound:
-            def play(self):
-                pass
-        pygame.mixer.Sound = MockSound
+try:
+    pygame.mixer.init()
+except pygame.error:
+    pass
 
 pygame.mixer.init()
 
