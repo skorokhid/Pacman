@@ -3,14 +3,7 @@ import pygame
 import os
 
 pygame.init()
-
-
-
-try:
-    pygame.mixer.init()
-except pygame.error:
-    pass
-
+pygame.mixer.init()
 
 
 # Initialize sound variables
