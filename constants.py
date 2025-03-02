@@ -11,7 +11,6 @@ try:
 except pygame.error:
     pass
 
-pygame.mixer.init()
 
 
 # Initialize sound variables
