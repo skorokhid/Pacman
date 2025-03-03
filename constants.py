@@ -3,16 +3,26 @@ import pygame
 import os
 
 pygame.init()
-if os.getenv("DISABLE_SOUND") != "1":
-    pygame.mixer.init()  # Ініціалізуємо звук тільки якщо DISABLE_SOUND не встановлено в 1
+
+if pygame.mixer.get_init() is None:
+    try:
+        pygame.mixer.init()
+    except pygame.error:
+        print("Sound system initialization failed. Sounds disabled.")
+        SOUND_ENABLED = False
+    else:
+        SOUND_ENABLED = True
 else:
-    print("Звук вимкнено для тестування.")
-
-# Initialize sound variables
-eat_sound = pygame.mixer.Sound("./sounds/collect.wav")
-lose_sound = pygame.mixer.Sound("./sounds/lose.wav")
-win_sound = pygame.mixer.Sound("./sounds/win.wav")
-
+    SOUND_ENABLED = True
+    
+if SOUND_ENABLED:
+    eat_sound = pygame.mixer.Sound("./sounds/collect.wav")
+    lose_sound = pygame.mixer.Sound("./sounds/lose.wav")
+    win_sound = pygame.mixer.Sound("./sounds/win.wav")
+else:
+    eat_sound = None
+    lose_sound = None
+    win_sound = None
 # Initialize font
 font = pygame.font.Font(None, 36)
 

@@ -9,20 +9,19 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      DISABLE_SOUND: 1
     steps:
       - uses: actions/checkout@v4.2.2
       - name: Set up Python
         uses: actions/setup-python@v5.4.0
         with:
           python-version: "3.11"
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
       - name: Install dependencies
         run: |
+          sudo apt-get install -y libsdl2-mixer-2.0-0  # Додаємо залежності SDL
           pip install -r requirements.txt
       - name: Run tests
+        env:
+          SDL_AUDIODRIVER: dummy  
         run: |
           pytest tests/ --html=report.html
       - name: Upload test report
@@ -42,7 +41,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install flake8-html
       - name: Run Flake8
         run: |
           flake8 --format=html --htmldir=flake8_report
