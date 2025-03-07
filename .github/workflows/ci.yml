@@ -18,14 +18,19 @@ jobs:
       - name: Install SDL dependencies
         run: |
           sudo add-apt-repository universe -y
-          sudo apt-get update
-          sudo apt-get install -y libsdl2-mixer-2.0-0v5
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+              libsdl2-2.0-0 \
+              libsdl2-mixer-2.0-0 \
+              libsdl2-ttf-2.0-0 \
+              libsdl2-image-2.0-0
       - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
       - name: Run tests
         env:
-          CI: "true" 
+          SDL_AUDIODRIVER: dummy  # Вимикаємо звук
+          CI: "true"
         run: |
           pytest tests/ --html=report.html
       - name: Upload test report
