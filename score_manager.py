@@ -1,5 +1,4 @@
-import pygame
-from constants import *
+from constants import WHITE, font
 
 class ScoreManager:
     def __init__(self):

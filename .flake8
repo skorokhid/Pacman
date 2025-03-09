@@ -1,4 +1,4 @@
 [flake8]
-exclude = .venv, migrations, __init__.py
+exclude = .venv, migrations, __init__.py, tests
 ignore = E501, W503
 max-line-length = 120

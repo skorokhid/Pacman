@@ -1,7 +1,7 @@
 # constants.py
 import pygame
 import os
-
+ 
 pygame.init()
 
 if pygame.mixer.get_init() is None:
@@ -27,6 +27,9 @@ else:
 font = pygame.font.Font(None, 36)
 
 # Constants
+WALL = 1
+PELLET = 0
+POWER_PELLET = 4
 CELL_SIZE = 40
 GRID_WIDTH = 15
 GRID_HEIGHT = 15

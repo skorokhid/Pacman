@@ -1,6 +1,5 @@
-# main.py
+
 import pygame
-import sys
 from game import Game
 from helpers import load_highscores, save_highscore, draw_highscores, clear_highscores
 
