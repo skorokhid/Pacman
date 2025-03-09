@@ -5,5 +5,7 @@
 /__pycache__
 .venv/
 .vscode/
-report.html
+*html
 !requirements.txt
+*svg
+*css
