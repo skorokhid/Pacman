@@ -9,7 +9,7 @@ from maze import Maze
 from sound_manager import SoundManager
 from score_manager import ScoreManager
 from game_state import GameState
-from constants import *
+from constants import BLACK, CYAN, ORANGE, RED, SCREEN_HEIGHT, SCREEN_WIDTH, VIOLET, WHITE, YELLOW  
 
 class Game:
     def __init__(self):

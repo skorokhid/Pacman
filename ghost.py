@@ -1,6 +1,7 @@
 import pygame
 import random
-from constants import *
+from constants import CELL_SIZE, GRID_HEIGHT, GRID_WIDTH
+
 
 class Ghost:
     def __init__(self, x, y, color):

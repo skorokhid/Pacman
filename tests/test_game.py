@@ -4,7 +4,6 @@ from unittest.mock import patch
 from game import Game
 from game_state import GameState
 
-
 @pytest.fixture
 def game():
     # Мокуємо GameSettings, щоб він не викликав argparse

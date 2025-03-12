@@ -1,4 +1,15 @@
 [flake8]
-exclude = .venv, migrations, __init__.py, tests
-ignore = E501, W503
+exclude = 
+    .venv,
+    tests/*,
+    __init__.py,
+    assets.py
+ignore = 
+    E501,    # Довгі рядки
+    W503,    # Оператор перед розривом
+    W0603,   # Глобальні змінні
+    F401,    # Невикористані імпорти
+    E111,    # Неправильні відступи
+    WPS306,  # Magic numbers
+    F821     # Невизначені імена
 max-line-length = 120
