@@ -1,6 +1,7 @@
 import argparse
 from constants import PINK, GRAY, BLACK  # явний імпорт констант
 
+
 class GameSettings:
     def __init__(self, test_mode=False):
         self.difficulty = 'easy'  # узгоджуємо з дефолтним значенням argparse
@@ -8,7 +9,6 @@ class GameSettings:
         self.pacman_move_delay = 150
         self.ghost_move_delay = 400
         self.mouth_anim_delay = 500
-        
         if not test_mode:
             self.parse_args()
             self.set_delays()  # викликаємо налаштування затримок

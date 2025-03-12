@@ -1,7 +1,7 @@
 import sys
-from tkinter import font
 import pygame
-from constants import BLACK, GRAY, PINK, SCREEN_WIDTH, WHITE, YELLOW  
+from constants import BLACK, GRAY, PINK, SCREEN_WIDTH, WHITE, YELLOW, font
+
 
 class Menu:
     def __init__(self, screen):

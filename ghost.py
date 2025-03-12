@@ -1,6 +1,6 @@
 import pygame
 import random
-from constants import CELL_SIZE, GRID_HEIGHT, GRID_WIDTH
+from constants import CELL_SIZE, GRID_HEIGHT, GRID_WIDTH, WALL
 
 
 class Ghost:
@@ -16,7 +16,7 @@ class Ghost:
             new_x, new_y = self.x + dx, self.y + dy
             # Перевірка на межі лабіринту
             if 0 <= new_x < GRID_WIDTH and 0 <= new_y < GRID_HEIGHT:
-                if grid[new_y][new_x] != 1:  # Перевірка на стіну
+                if grid[new_y][new_x] != WALL:  # Перевірка на стіну
                     self.x, self.y = new_x, new_y
                     break
 
